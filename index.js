@@ -1,16 +1,16 @@
+// index.js
 require('dotenv').config();
 const express = require('express');
+const app = express();
 const cors = require('cors');
-const path = require('path');
-const connection = require('./db');
+const { mongoose, connectToDatabase } = require('./db'); // Import both mongoose and connectToDatabase
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const quoteRoutes = require('./routes/quotes');
+const path = require('path');
 
-const app = express();
-
-// Database connection
-connection();
+// Connect to the database
+connectToDatabase();
 
 // Middlewares
 app.use(express.json());
@@ -21,21 +21,12 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/quote', quoteRoutes);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client', 'build')));
+app.use(express.static(path.join(__dirname, './client/build')));
 
-// Catch-all route for serving React app
-app.get('*', function(req, res) {
-  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+app.use('*', function (req, res) {
+    res.sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}...`);
-});
+app.listen(port, () => console.log(`Listening on port ${port}...`));
 
-// Error handling
-app.on('error', (error) => {
-  console.error('Express server error:', error.message);
-  process.exit(1); // Exit the process on error for better visibility
-});
