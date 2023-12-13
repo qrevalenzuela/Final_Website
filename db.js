@@ -1,15 +1,21 @@
 const mongoose = require("mongoose");
 
-mongoose.connect(process.env.DB);
+// Connect to MongoDB
+mongoose.connect(process.env.DB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-const connection = mongoose.connection;
+const db = mongoose.connection;
 
-connection.on("connected", () => {
+// Event listeners for successful connection and error
+db.on("connected", () => {
   console.log("MongoDB connection is successful");
 });
 
-connection.on("error", (error) => {
-  console.log("Error in MongoDB connection", error);
+db.on("error", (error) => {
+  console.error("Error in MongoDB connection", error);
 });
 
+// Export the connected mongoose instance
 module.exports = mongoose;
